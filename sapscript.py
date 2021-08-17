@@ -28,7 +28,7 @@ def SAP_OP():
         SapGuiAuto = None
         return
 
-    pathExel = "C:/Automation/Automate_NF_Transicao_Teste.xlsx"
+    pathExel = "Automate_NF_Transicao_Teste.xlsx"
     wb_obj = openpyxl.load_workbook(pathExel) 
     sheet_obj = wb_obj.active 
 
