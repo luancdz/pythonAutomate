@@ -1,0 +1,15 @@
+Steps
+
+Step 1. Clone this repository: https://github.com/luancdz/pythonAutomate
+
+Step 2. Create a new virtual environment
+python -m venv tfod
+
+Step 3. Activate your virtual environment
+source tfod/bin/activate # Linux
+.\tfod\Scripts\activate # Windows 
+
+Step 4. Install dependencies and add virtual environment to the Python Kernel
+python -m pip install --upgrade pip
+pip install ipykernel
+python -m ipykernel install --user --name=tfodj
