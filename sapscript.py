@@ -1,5 +1,5 @@
-from traceback import print_tb
-import win32com.client
+
+#import win32com.client
 import sys
 import openpyxl
 import time
@@ -72,26 +72,17 @@ def SAP_OP():
     sapGui.session.findById("wnd[0]").sendVKey(0)
     sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/txtGS_SELFIELDS-FIELDNAME[6,1]").setFocus()
     sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/txtGS_SELFIELDS-FIELDNAME[6,1]").caretPosition = 5
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 3
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 6
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 9
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 12
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 15
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 18
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 21
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 24
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 27
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 30
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 33
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 36
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 39
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 42
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC").verticalScrollbar.position = 45
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,25]").text = str(shipPoint.value)
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,25]").setFocus
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,25]").caretPosition = 4
-    sapGui.session.findById("wnd[0]").sendVKey(8)
-    sapGui.session.findById("wnd[0]/usr/txtGD-NUMBER").setFocus
+    
+    sapGui.session.findById("wnd[0]/tbar[0]/btn[71]").press()
+    sapGui.session.findById("wnd[1]/usr/sub:SAPLSPO4:0300/txtSVALD-VALUE[0,21]").text = "VSTEL"
+    sapGui.session.findById("wnd[1]/usr/sub:SAPLSPO4:0300/txtSVALD-VALUE[0,21]").caretPosition = 5
+    sapGui.session.findById("wnd[1]").sendVKey(0)
+    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,0]").text = str(shipPoint.value)
+    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,0]").setFocus()
+    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,0]").caretPosition = 4
+    sapGui.session.findById("wnd[0]/tbar[1]/btn[8]").press()
+    
+    sapGui.session.findById("wnd[0]/usr/txtGD-NUMBER").setFocus()
     sapGui.session.findById("wnd[0]/usr/txtGD-NUMBER").caretPosition = 0
     itmnun = sapGui.session.findById("wnd[0]/usr/txtGD-NUMBER").text
     sapGui.session.findById("wnd[0]/tbar[0]/btn[3]").press
