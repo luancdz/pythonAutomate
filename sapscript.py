@@ -1,8 +1,10 @@
+from traceback import print_tb
 import win32com.client
 import sys
 import openpyxl
 import time
 import loginSAP
+from   runScripstClass import RunScripts
 
 def SAP_OP():
 
@@ -12,28 +14,6 @@ def SAP_OP():
     sapGui  =  loginSAP.SapGui()
 
 
-    # SapGuiAuto = win32com.client.GetObject("SAPGUI")
-    # if not type(SapGuiAuto) == win32com.client.CDispatch:
-    #     return
-
-    # application = SapGuiAuto.GetScriptingEngine
-    # if not type(application) == win32com.client.CDispatch:
-    #     SapGuiAuto = None
-    #     return
-
-    # connection = application.Children(0)
-    # if not type(connection) == win32com.client.CDispatch:
-    #     application = None
-    #     SapGuiAuto = None
-    #     return
-
-    # session = connection.Children(0)
-    # if not type(session) == win32com.client.CDispatch:
-    #     connection = None
-    #     application = None
-    #     SapGuiAuto = None
-    #     return
-
     pathExel = "Automate_NF_Transicao_Teste.xlsx"
     wb_obj = openpyxl.load_workbook(pathExel) 
     sheet_obj = wb_obj.active 
@@ -41,26 +21,15 @@ def SAP_OP():
 
     ovOrig = sheet_obj.cell(row = 2, column = 1)  
 
+    runScript = RunScripts(sapGui)
+
     #script para pegar o numero da OV do
-    sapGui.session.findById("wnd[0]").maximize()
-    sapGui.session.findById("wnd[0]/tbar[0]/okcd").text = "/nzse16n"
-    sapGui.session.findById("wnd[0]").sendVKey(0)
-    sapGui.session.findById("wnd[0]/usr/ctxtGD-TAB").text = "/USE/PDS3_OBJMAP"
-    sapGui.session.findById("wnd[0]").sendVKey(0)
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,1]").text = "PAG"
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,2]").text = "410"
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,3]").text = "SALES_DOC"
-    print(ovOrig.value)
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,4]").text = "*" + str(ovOrig.value) + "*"
-    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,4]").caretPosition = 1
-    sapGui.session.findById("wnd[0]").sendVKey(0)
-    sapGui.session.findById("wnd[0]").sendVKey(8)
-    sapGui.session.findById("wnd[0]/usr/cntlRESULT_LIST/shellcont/shell").currentCellColumn = ""
-    sapGui.session.findById("wnd[0]/usr/cntlRESULT_LIST/shellcont/shell").selectedRows = "0"
-    sapGui.session.findById("wnd[0]/usr/cntlRESULT_LIST/shellcont/shell").pressToolbarButton("DETAIL")
-    sapGui.session.findById("wnd[1]/usr/tblSAPLTSWUSLDETAIL_TAB/txtGT_SELFIELDS-LOW[1,7]").setFocus()
-    sapGui.session.findById("wnd[1]/usr/tblSAPLTSWUSLDETAIL_TAB/txtGT_SELFIELDS-LOW[1,7]").caretPosition = 0
-    ovNew = sapGui.session.findById("wnd[1]/usr/tblSAPLTSWUSLDETAIL_TAB/txtGT_SELFIELDS-LOW[1,7]").text
+
+    try: 
+        ovNew = runScript.getOVfromProd(ovOrig.value)
+    except:
+        print('Falha ao recuperar doc de PRD')
+        print("next document")
 
     tpOV = sheet_obj.cell(row = 2, column = 10) 
     ovRef = sheet_obj.cell(row = 2, column = 12)
@@ -184,7 +153,6 @@ def SAP_OP():
     qtdItem = sheet_obj.cell(row = 2, column = 5)
     sapGui.session.findById("wnd[0]/usr/sub:SAPMM07M:0421/txtMSEG-ERFMG[0,26]").text = qtdItem.value
 
-
     sapGui.session.findById("wnd[0]/usr/sub:SAPMM07M:0421/ctxtMSEG-LGORT[0,48]").text = stLocation.value
     sapGui.session.findById("wnd[0]/usr/sub:SAPMM07M:0421/ctxtMSEG-CHARG[0,53]").setFocus()
     sapGui.session.findById("wnd[0]/usr/sub:SAPMM07M:0421/ctxtMSEG-CHARG[0,53]").caretPosition = 0
@@ -195,7 +163,6 @@ def SAP_OP():
     sapGui.session.findById("wnd[1]").sendVKey(0)
     print(serNum)
     sapGui.session.findById("wnd[0]").sendVKey(11)
-
 
     #Picking
     for i in range(int(itmnun + 1)):
@@ -234,6 +201,18 @@ def SAP_OP():
     sapGui.session.findById("wnd[0]").sendVKey(0)
     sapGui.session.findById("wnd[0]").sendVKey(0)
     sapGui.session.findById("wnd[0]/tbar[0]/btn[11]").press()
+
+
+    #recupera a billing criada
+
+    billDoc = sheet_obj.cell(row = 2, column = 14)
+    sapGui.session.findById("wnd[0]/tbar[0]/okcd").text = "/nvf02"
+    sapGui.session.findById("wnd[0]").sendVKey(0)
+    billDoc.value = str(sapGui.session.findById("wnd[0]/usr/ctxtVBRK-VBELN").text)
+
+    wb_obj.save(pathExel)
+
+
 
 
     while sapGui.connection.children.count > 0:
