@@ -2,17 +2,21 @@ import subprocess
 import time
 from types import new_class
 import win32com.client
+import psutil
 
 class SapGui(object):
 
-
-
     def __init__(self):
+
+        for proc in psutil.process_iter():
+            if proc.name() == "saplogon.exe":
+                proc.kill()
 
 
         try:
             #verifica se o SAP GUI ja esta aberto
-            win32com.client.GetObject("SAPGUI")
+            sapgui = win32com.client.GetObject("SAPGUI")
+            #sapgui.
         except:
             #caso não, abre via .exe
             self.path = r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe"

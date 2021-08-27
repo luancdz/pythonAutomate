@@ -5,26 +5,22 @@ import openpyxl
 import time
 import loginSAP
 from   runScripstClass import RunScripts
+import constants
 
 def SAP_OP():
-
-    excelPath = r'#'
 
     #call class open SAP GUI
     sapGui  =  loginSAP.SapGui()
 
-
-    pathExel = "Automate_NF_Transicao_Teste.xlsx"
+    pathExel = constants.FILENAME
     wb_obj = openpyxl.load_workbook(pathExel) 
     sheet_obj = wb_obj.active 
-
 
     ovOrig = sheet_obj.cell(row = 2, column = 1)  
 
     runScript = RunScripts(sapGui)
 
     #script para pegar o numero da OV do
-
     try: 
         ovNew = runScript.getOVfromProd(ovOrig.value)
     except:
@@ -52,6 +48,7 @@ def SAP_OP():
         sapGui.session.findById("wnd[0]/tbar[0]/okcd").text = "/nva02"
         sapGui.session.findById("wnd[0]").sendVKey(0)
         ovRef.value = sapGui.session.findById("wnd[0]/usr/ctxtVBAK-VBELN").text
+
     except:
         print(sys.exc_info()[0])
     
@@ -117,8 +114,11 @@ def SAP_OP():
     sapGui.session.findById("wnd[0]/tbar[0]/okcd").text = "/nvl02n"
     sapGui.session.findById("wnd[0]").sendVKey(0)
     print(sapGui.session.findById("wnd[0]/usr/ctxtLIKP-VBELN").text)
+    
     dlvNum = sheet_obj.cell(row = 2, column = 13)
     dlvNum.value = sapGui.session.findById("wnd[0]/usr/ctxtLIKP-VBELN").text
+    dlvNum2 = sheet_obj.cell(row = 2, column = 14)
+    dlvNum2.value = sapGui.session.findById("wnd[0]/usr/ctxtLIKP-VBELN").text
     wb_obj.save(pathExel)
 
     #define serial number/ set stock
@@ -128,7 +128,6 @@ def SAP_OP():
     sapGui.session.findById("wnd[0]/usr/ctxtRM07M-SOBKZ").text = "E"
 
     plant = sheet_obj.cell(row = 2, column = 3)
-
     sapGui.session.findById("wnd[0]/usr/ctxtRM07M-WERKS").text = plant.value
     sapGui.session.findById("wnd[0]/usr/ctxtRM07M-GRUND").setFocus
     sapGui.session.findById("wnd[0]/usr/ctxtRM07M-GRUND").caretPosition = 0
@@ -150,10 +149,14 @@ def SAP_OP():
     sapGui.session.findById("wnd[0]").sendVKey(0)
     sapGui.session.findById("wnd[1]/tbar[0]/btn[7]").press
     sapGui.session.findById("wnd[1]").sendVKey(7)
-    serNum = sapGui.session.findById("wnd[1]/usr/tblSAPLIPW1TC_SERIAL_NUMBERS/ctxtRIPW0-SERNR[0,0]").text
+
+    #SAVE SERIAL NUMBER
+    serNum = sheet_obj.cell(row = 2, column = 8)
+    serNum.value = sapGui.session.findById("wnd[1]/usr/tblSAPLIPW1TC_SERIAL_NUMBERS/ctxtRIPW0-SERNR[0,0]").text
     sapGui.session.findById("wnd[1]").sendVKey(0)
-    print(serNum)
     sapGui.session.findById("wnd[0]").sendVKey(11)
+    wb_obj.save(pathExel)
+
 
     #Picking
     for i in range(int(itmnun + 1)):
@@ -180,7 +183,7 @@ def SAP_OP():
         sapGui.session.findById("wnd[0]").sendVKey(0)
         sapGui.session.findById("wnd[0]/mbar/menu[3]").select()
         sapGui.session.findById("wnd[0]/mbar/menu[3]/menu[3]").select()
-        sapGui.session.findById("wnd[1]/usr/tblSAPLIPW1TC_SERIAL_NUMBERS/ctxtRIPW0-SERNR[0,0]").text = str(serNum)
+        sapGui.session.findById("wnd[1]/usr/tblSAPLIPW1TC_SERIAL_NUMBERS/ctxtRIPW0-SERNR[0,0]").text = str(serNum.value)
         sapGui.session.findById("wnd[1]/usr/tblSAPLIPW1TC_SERIAL_NUMBERS/ctxtRIPW0-SERNR[0,0]").caretPosition = 3
         sapGui.session.findById("wnd[0]").sendVKey(0)
         sapGui.session.findById("wnd[0]").sendVKey(11)
@@ -195,8 +198,7 @@ def SAP_OP():
 
 
     #recupera a billing criada
-
-    billDoc = sheet_obj.cell(row = 2, column = 14)
+    billDoc = sheet_obj.cell(row = 2, column = 15)
     sapGui.session.findById("wnd[0]/tbar[0]/okcd").text = "/nvf02"
     sapGui.session.findById("wnd[0]").sendVKey(0)
     billDoc.value = str(sapGui.session.findById("wnd[0]/usr/ctxtVBRK-VBELN").text)
@@ -204,7 +206,25 @@ def SAP_OP():
     wb_obj.save(pathExel)
 
 
+    #GET GOODS MVT DOC
+    goodMov = sheet_obj.cell(row = 2, column = 16)
+    sapGui.session.findById("wnd[0]/tbar[0]/okcd").text = "/nzse16n"
+    sapGui.session.findById("wnd[0]").sendVKey(0)
+    sapGui.session.findById("wnd[0]/usr/ctxtGD-TAB").text = "VBFA"
+    sapGui.session.findById("wnd[0]").sendVKey(0)
+    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,1]").text = ovNew
+    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,2]").text = nrItem.value
+    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,5]").text = constants.GOOD_MOV
+    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,5]").setFocus
+    sapGui.session.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,5]").caretPosition = 1
+    sapGui.session.findById("wnd[0]/tbar[1]/btn[8]").press()
+    sapGui.session.findById("wnd[0]/usr/cntlRESULT_LIST/shellcont/shell").doubleClickCurrentCell()
+    goodMov.value = sapGui.session.findById("wnd[1]/usr/tblSAPLTSWUSLDETAIL_TAB/txtGT_SELFIELDS-LOW[1,3]").text
+    sapGui.session.findById("wnd[1]").close()
+    sapGui.session.findById("wnd[0]/tbar[0]/btn[15]").press()
+    sapGui.session.findById("wnd[0]/tbar[0]/btn[15]").press()
 
+    wb_obj.save(pathExel)
 
     while sapGui.connection.children.count > 0:
         time.sleep(10)
