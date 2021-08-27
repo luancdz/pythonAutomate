@@ -36,6 +36,12 @@ class SapGui(object):
         self.session = self.connection.Children(0)
         self.session.findById("wnd[0]").maximize()
 
+    def killSAP(self):
+        
+        for proc in psutil.process_iter():
+            if proc.name() == "saplogon.exe":
+                proc.kill()
+
 
 #if __name__ == '__main__':
 #    Object  =  SapGui();

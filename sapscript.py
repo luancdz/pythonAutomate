@@ -132,9 +132,12 @@ def SAP_OP():
     goodMov.value = runScript.getGoodsMvt(ovRef.value, nrItem.value, constant.GOOD_MOV)    
     wb_obj.save(pathExel)
 
-    while sapGui.connection.children.count > 0:
-        time.sleep(10)
-        print("SAP GUI OPEN")
+    messagebox.showinfo("Show info", "Script Finalizado")
+    sapGui.killSAP()
+
+    # while sapGui.connection.children.count > 0:
+    #     time.sleep(10)
+    #     print("SAP GUI OPEN")
 
 
     # session = None
