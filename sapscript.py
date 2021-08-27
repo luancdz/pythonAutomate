@@ -2,16 +2,20 @@
 import sys
 import openpyxl
 import time
+
+from win32com.client.makepy import main
 import loginSAP
 from   runScripstClass import RunScripts
-import constants
+import constant
+from tkinter import *
+from tkinter import messagebox
 
 def SAP_OP():
 
     #call class open SAP GUI
     sapGui  =  loginSAP.SapGui()
 
-    pathExel = constants.FILENAME
+    pathExel = constant.FILENAME
     wb_obj = openpyxl.load_workbook(pathExel) 
     sheet_obj = wb_obj.active
     ovOrig = sheet_obj.cell(row = 2, column = 1) 
@@ -125,7 +129,7 @@ def SAP_OP():
 
     #GET GOODS MVT DOC
     goodMov = sheet_obj.cell(row = 2, column = 16)
-    goodMov.value = runScript.getGoodsMvt(ovRef.value, nrItem.value, constants.GOOD_MOV)    
+    goodMov.value = runScript.getGoodsMvt(ovRef.value, nrItem.value, constant.GOOD_MOV)    
     wb_obj.save(pathExel)
 
     while sapGui.connection.children.count > 0:
@@ -138,4 +142,12 @@ def SAP_OP():
     # application = None
     # SapGuiAuto = None
 
-SAP_OP()
+if __name__ == '__main__':
+    window = Tk()
+    window.geometry("200x50")
+    window.title("NF AG3 SAP")
+    button = Button(window, text='Iniciar Script', command= lambda : SAP_OP())
+    button.pack()
+    mainloop()
+
+#SAP_OP()
