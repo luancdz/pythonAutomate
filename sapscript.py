@@ -1,11 +1,9 @@
 #import win32com.client
-import sys
+from screenShotClass import ScreenShot
 import openpyxl
 import time
-
-from win32com.client.makepy import main
 import loginSAP
-from   runScripstClass import RunScripts
+from runScripstClass import RunScripts
 import constant
 from tkinter import *
 from tkinter import messagebox
@@ -18,120 +16,86 @@ def SAP_OP():
     pathExel = constant.FILENAME
     wb_obj = openpyxl.load_workbook(pathExel) 
     sheet_obj = wb_obj.active
-    ovOrig = sheet_obj.cell(row = 2, column = 1) 
-    
-    runScript = RunScripts(sapGui)
 
-    #Get SO from PRD
-    try: 
-        ovNew = runScript.getSOfromProd(ovOrig.value)
+    #total rows at spreadsheet
+    numRow = sheet_obj.max_row
 
-    except:
-        print('Falha ao recuperar doc de PRD')
-        print("next document")
+    for index in range( constant.INDEX_WITH_HEADER ,numRow + 1):
 
+        try: 
 
-    #get from spreadsheet Type SO and set SO Ref
-    tpOV = sheet_obj.cell(row = 2, column = 10) 
-    ovRef = sheet_obj.cell(row = 2, column = 12)
+            ovOrig = sheet_obj.cell(row = index, column = 1) 
+            
+            runScript = RunScripts(sapGui)
 
-    #Create SO with reference
-    try:
+            #Get SO from PRD
+            ovNew = runScript.getSOfromProd(ovOrig.value)
 
-        ovRef.value = runScript.createSOByRef(tpOV.value, ovNew)
+            #get from spreadsheet Type SO and set SO Ref
+            tpOV = sheet_obj.cell(row = index, column = 4) 
+            ovRef = sheet_obj.cell(row = index, column = 12)
 
-    except:
-        print(sys.exc_info()[0])
-    
- 
-    #Save Shiping point into Spredsheet
-    shipPoint = sheet_obj.cell(row = 2, column = 7)
-    wb_obj.save(pathExel)
+            ovRef.value = runScript.createSOByRef(tpOV.value, ovNew)
 
-    #get ITM NUM by SO
-    try:
+            #shipPoint = sheet_obj.cell(row = 2, column = 7)
+            wb_obj.save(pathExel)
 
-        itmnun = runScript.getItmNum(ovRef.value, shipPoint.value)
+            shipPoint = sheet_obj.cell(row = index, column = 7)
 
-    except:
-        print(sys.exc_info()[0])
+            #Define serial number/ set stock
+            plant = sheet_obj.cell(row = index, column = 3)
+            nrItem = sheet_obj.cell(row = index, column = 6)
+            matnr = sheet_obj.cell(row = index, column = 2)
+            qtdItem = sheet_obj.cell(row = index, column = 5)
+            serNum = sheet_obj.cell(row = index, column = 8)
+            stLocation = sheet_obj.cell(row = index, column = 11)
+            stLocation.value = runScript.getStoredLoc(shipPoint.value, ovRef.value, index - 2)
 
-    itmnun = int(itmnun) - 1
+            serNum.value = runScript.setStockAndSerNumber(ovRef.value, plant.value, nrItem.value, matnr.value, qtdItem.value, stLocation.value)
 
-    #get Stored location by ITMUN
-    for i in range(int(itmnun + 1)):
+            #SAVE SERIAL NUMBER
+            wb_obj.save(pathExel)
 
-        try:
+            #Delivery save 
+            runScript.saveDelivery(shipPoint.value, ovRef.value)
+            deliveryValue = runScript.getDelivery()
 
-            stLocation = sheet_obj.cell(row = 2, column = 11)
-            stLocation.value = runScript.getStoredLoc(shipPoint.value, ovRef.value, i)
+            #Save Delivery into SpreadSheet
+            dlvNum = sheet_obj.cell(row = index, column = 13)
+            dlvNum2 = sheet_obj.cell(row = index, column = 14)
 
-        except:
-            print(sys.exc_info()[0])
+            dlvNum.value = deliveryValue
+            dlvNum2.value = deliveryValue
+            wb_obj.save(pathExel)
 
-
-    #Delivery save 
-    try:
-
-        deliveryValue = runScript.getDelivery()
-
-    except:
-        print(sys.exc_info()[0])
-
-
-    #Save Delivery into SpreadSheet
-    dlvNum = sheet_obj.cell(row = 2, column = 13)
-    dlvNum2 = sheet_obj.cell(row = 2, column = 14)
-
-    dlvNum.value = deliveryValue
-    dlvNum2.value = deliveryValue
-    wb_obj.save(pathExel)
-
-
-    #define serial number/ set stock
-    plant = sheet_obj.cell(row = 2, column = 3)
-    nrItem = sheet_obj.cell(row = 2, column = 6)
-    matnr = sheet_obj.cell(row = 2, column = 2)
-    qtdItem = sheet_obj.cell(row = 2, column = 5)
-
-    try:
-        serNum = sheet_obj.cell(row = 2, column = 8)
-        serNum.value = runScript.setStockAndSerNumber(ovRef.value, plant.value, nrItem.value, matnr.value, qtdItem.value, stLocation.value)
-
-    except:
-        print(sys.exc_info()[0])
-
-    
-    #SAVE SERIAL NUMBER
-    wb_obj.save(pathExel)
-
-
-    #Picking
-    for i in range(int(itmnun + 1)):
-
-        try:
             #Picking
             runScript.setDefPicking(qtdItem.value)
 
-            #set serial number and post good issues
+             #set serial number and post good issues
             runScript.setSerialNumAndPostGI(serNum.value)
 
-            #Set Serial number at DLV
+            #get billing doc
+            billDoc = sheet_obj.cell(row = index, column = 15)
+            billDoc.value = runScript.createBilling()
+            wb_obj.save(pathExel)
+
+            #GET GOODS MVT DOC
+            goodMov = sheet_obj.cell(row = index, column = 16)
+            goodMov.value = runScript.getGoodsMvt(ovRef.value, nrItem.value, constant.GOOD_MOV)    
+            wb_obj.save(pathExel)
 
         except:
-            print(sys.exc_info()[0])
+            
+            screenShot = ScreenShot()
+            time.sleep(2)
+            screenShot.screenShot(ovOrig.value)
 
+            print('Error, verificar Screen Shots')
 
-    #get billing doc
-    billDoc = sheet_obj.cell(row = 2, column = 15)
-    billDoc.value = runScript.createBilling()
-    wb_obj.save(pathExel)
+        finally:
+            continue
 
-    #GET GOODS MVT DOC
-    goodMov = sheet_obj.cell(row = 2, column = 16)
-    goodMov.value = runScript.getGoodsMvt(ovRef.value, nrItem.value, constant.GOOD_MOV)    
-    wb_obj.save(pathExel)
-
+ 
     messagebox.showinfo("Show info", "Script Finalizado")
     sapGui.killSAP()
 
@@ -147,9 +111,9 @@ def SAP_OP():
 
 if __name__ == '__main__':
     window = Tk()
-    window.geometry("200x50")
-    window.title("NF AG3 SAP")
-    button = Button(window, text='Iniciar Script', command= lambda : SAP_OP())
+    window.geometry("200x75")
+    window.title("NF Automate SAP")
+    button = Button(window, text='AG3 Login', command= lambda : SAP_OP())
     button.pack()
     mainloop()
 

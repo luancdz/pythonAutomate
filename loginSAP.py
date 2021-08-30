@@ -1,6 +1,5 @@
 import subprocess
 import time
-from types import new_class
 import win32com.client
 import psutil
 
@@ -11,7 +10,6 @@ class SapGui(object):
         for proc in psutil.process_iter():
             if proc.name() == "saplogon.exe":
                 proc.kill()
-
 
         try:
             #verifica se o SAP GUI ja esta aberto
@@ -38,6 +36,9 @@ class SapGui(object):
 
     def killSAP(self):
         
+        self.connection = None
+        self.session = None
+
         for proc in psutil.process_iter():
             if proc.name() == "saplogon.exe":
                 proc.kill()

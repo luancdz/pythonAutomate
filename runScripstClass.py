@@ -1,7 +1,5 @@
-import subprocess
-import time
-import win32com.client
 import sys
+import constant
 
 class RunScripts(object):
 
@@ -15,9 +13,9 @@ class RunScripts(object):
         try:
 
             self.SapGuiSession.findById("wnd[0]").maximize()
-            self.SapGuiSession.findById("wnd[0]/tbar[0]/okcd").text = "/nzse16n"
+            self.SapGuiSession.findById("wnd[0]/tbar[0]/okcd").text = constant.ZSE16N
             self.SapGuiSession.findById("wnd[0]").sendVKey(0)
-            self.SapGuiSession.findById("wnd[0]/usr/ctxtGD-TAB").text = "/USE/PDS3_OBJMAP"
+            self.SapGuiSession.findById("wnd[0]/usr/ctxtGD-TAB").text = constant.OBJMAP
             self.SapGuiSession.findById("wnd[0]").sendVKey(0)
             self.SapGuiSession.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,1]").text = "PAG"
             self.SapGuiSession.findById("wnd[0]/usr/tblSAPLSE16NSELFIELDS_TC/ctxtGS_SELFIELDS-LOW[2,2]").text = "410"
@@ -55,8 +53,12 @@ class RunScripts(object):
             self.SapGuiSession.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/ssubHEADER_FRAME:SAPMV45A:4440/cmbVBAK-LIFSK").setFocus
             self.SapGuiSession.findById("wnd[0]/tbar[0]/btn[11]").press
             self.SapGuiSession.findById("wnd[0]").sendVKey(11)
+            print(self.SapGuiSession.findById("wnd[0]/usr/subSUBSCREEN_HEADER:SAPMV45A:4021/subPART-SUB:SAPMV45A:4701/ctxtKUAGV-KUNNR").text)
+            if self.SapGuiSession.findById("wnd[0]/usr/subSUBSCREEN_HEADER:SAPMV45A:4021/subPART-SUB:SAPMV45A:4701/ctxtKUAGV-KUNNR").text:   #KUNNR
+                raise ("SO didn't created")
             self.SapGuiSession.findById("wnd[0]/tbar[0]/okcd").text = "/nva02"
             self.SapGuiSession.findById("wnd[0]").sendVKey(0)
+
             return  str(self.SapGuiSession.findById("wnd[0]/usr/ctxtVBAK-VBELN").text)
         
         except:
@@ -105,14 +107,28 @@ class RunScripts(object):
             self.SapGuiSession.findById("wnd[0]").sendVKey(0)
             self.SapGuiSession.findById("wnd[0]").sendVKey(0)
             self.SapGuiSession.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\\02").select()
+            print(self.SapGuiSession.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\\02/ssubSUBSCREEN_BODY:SAPMV50A:1104/tblSAPMV50ATC_LIPS_PICK/ctxtLIPS-LGORT[3," + str(index) +"]").text)
+            return str(self.SapGuiSession.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\\02/ssubSUBSCREEN_BODY:SAPMV50A:1104/tblSAPMV50ATC_LIPS_PICK/ctxtLIPS-LGORT[3," + str(index) +"]").text)
 
-            stLocation = str(self.SapGuiSession.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\\02/ssubSUBSCREEN_BODY:SAPMV50A:1104/tblSAPMV50ATC_LIPS_PICK/ctxtLIPS-LGORT[3," + str(index) +"]").text)
+            
+        except:
+            
+            raise print(sys.exc_info()[0])
 
-
+    def saveDelivery(self, shipPoint, sORef):
+        try:
+            
+            #Recupera storedlocation
+            self.SapGuiSession.findById("wnd[0]/tbar[0]/okcd").text = "/nvl01n"
+            self.SapGuiSession.findById("wnd[0]").sendVKey(0)
+            self.SapGuiSession.findById("wnd[0]/usr/ctxtLIKP-VSTEL").text = str(shipPoint)
+            self.SapGuiSession.findById("wnd[0]/usr/ctxtLV50C-VBELN").text = str(sORef)
+            self.SapGuiSession.findById("wnd[0]").sendVKey(0)
+            self.SapGuiSession.findById("wnd[0]").sendVKey(0)
             self.SapGuiSession.findById("wnd[0]").sendVKey(11)
             self.SapGuiSession.findById("wnd[1]").sendVKey(0)      
 
-            return stLocation
+            return
             
         except:
             
