@@ -43,6 +43,9 @@ class SapGui(object):
             if proc.name() == "saplogon.exe":
                 proc.kill()
 
+    def getSession(self):
+        return self.session
+
 
 #if __name__ == '__main__':
 #    Object  =  SapGui();
