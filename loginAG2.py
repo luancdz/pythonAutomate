@@ -30,10 +30,13 @@ class SapGui(object):
         SapGuiAuto = None
 
         #login AG2
-        self.connection = application.OpenConnection("AG2 - North American Ag (SSO) (003)",False)
+        self.connection = application.OpenConnection("AG2 - North American Ag",True)
         time.sleep(3)
         self.session = self.connection.Children(0)
         self.session.findById("wnd[0]").maximize()
+        self.session.findById("wnd[0]/usr/txtRSYST-BNAME").text = "VMTESTID"
+        self.session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = "yellow2021"
+        self.session.findById("wnd[0]").sendVKey(0)
 
     def killSAP(self):
         
