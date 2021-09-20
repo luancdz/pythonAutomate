@@ -7,11 +7,12 @@ from runScripstClass import RunScripts
 import constant
 from tkinter import *
 from tkinter import messagebox
+import dsm
 
-def SAP_OP():
+def SAP_OP(landscape):
 
     #call class open SAP GUI
-    sapGui  =  loginSAP.SapGui()
+    sapGui  =  loginSAP.SapGui(landscape)
 
     pathExel = constant.FILENAME
     wb_obj = openpyxl.load_workbook(pathExel) 
@@ -110,11 +111,16 @@ def SAP_OP():
     # SapGuiAuto = None
 
 if __name__ == '__main__':
+    
     window = Tk()
     window.geometry("200x75")
     window.title("NF Automate SAP")
-    button = Button(window, text='AG3 Login', command= lambda : SAP_OP())
-    button.pack()
+    buttonDSM = Button(window, text='Execute DSM', command= lambda : dsm.SAP_OP())
+    buttonDSM.pack()
+    buttonAG3 = Button(window, text='AG3 Login', command= lambda : SAP_OP('AG3'))
+    buttonAG3.pack()
+    buttonAG2 = Button(window, text='AG2 Login', command= lambda : SAP_OP('AG2'))
+    buttonAG2.pack()
     mainloop()
 
 #SAP_OP()

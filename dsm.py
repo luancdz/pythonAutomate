@@ -13,7 +13,7 @@ from tkinter import messagebox
 def SAP_OP():
 
     #call class open SAP GUI
-    sapGui  =  loginSAP.SapGui()
+    sapGui  =  loginSAP.SapGui("PAG")
     session = sapGui.session 
     session.findById("wnd[0]/tbar[0]/okcd").text = "/n/use/dsm"
     session.findById("wnd[0]").sendVKey(0)
@@ -32,5 +32,6 @@ def SAP_OP():
     session.findById("wnd[0]/tbar[1]/btn[8]").press()
     session.findById("wnd[0]/tbar[0]/btn[3]").press()
     session.findById("wnd[0]/tbar[0]/btn[3]").press()
-if __name__ == '__main__':
-    SAP_OP()
+    
+#if __name__ == '__main__':
+#    SAP_OP()

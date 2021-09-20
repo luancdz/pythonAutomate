@@ -5,7 +5,15 @@ import psutil
 
 class SapGui(object):
 
-    def __init__(self):
+    def __init__(self, landscape):
+
+        def getLandscape(landscape):
+            switcher = {
+                "PAG": "PAG - North American AG Production (SSO)",
+                "AG3": "AG3 - North American Ag (SSO) (003)",
+                "AG2": "AG2 - North American Ag (SSO) (003)",
+            }
+            return switcher.get(landscape, False) 
 
         for proc in psutil.process_iter():
             if proc.name() == "saplogon.exe":
@@ -28,8 +36,9 @@ class SapGui(object):
         #self.SapGuiAuto = win32com.client.GetObject("SAPGUI")
         application = self.SapGuiAuto.GetScriptingEngine
 
-        #login AG3
-        self.connection = application.OpenConnection("AG3 - North American Ag (SSO) (003)",True)
+        #landscape = getLandscape(landscape)
+
+        self.connection = application.OpenConnection(getLandscape(landscape),True)
         time.sleep(3)
         self.session = self.connection.Children(0)
         self.session.findById("wnd[0]").maximize()
@@ -45,6 +54,15 @@ class SapGui(object):
 
     def getSession(self):
         return self.session
+
+
+
+ 
+    # get() method of dictionary data type returns
+    # value of passed argument if it is present
+    # in dictionary otherwise second argument will
+    # be assigned as default value of passed argument
+        return switcher.get(landscape, False)  
 
 
 #if __name__ == '__main__':
